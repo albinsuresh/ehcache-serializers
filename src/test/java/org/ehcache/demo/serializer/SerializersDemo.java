@@ -102,5 +102,27 @@ public class SerializersDemo {
     assertThat(fruitsCache.get(1L), is("apple"));
     // end::persistentSerializerGoodSample[]
   }
+  
+  @Test
+  public void testThirdPartySerializer() throws Exception {
+    // tag::thirdPartySerializer[]
+    CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);
+    CacheConfiguration<Long, String> cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder()
+        .withResourcePools(ResourcePoolsBuilder.newResourcePoolsBuilder()
+            .heap(10, EntryUnit.ENTRIES).offheap(1, MemoryUnit.MB))
+        .add(new DefaultSerializerConfiguration<String>(
+            KryoStringSerializer.class, SerializerConfiguration.Type.VALUE))   // <1>
+        .buildConfig(Long.class, String.class);
+
+    Cache<Long, String> fruitsCache = cacheManager.createCache("fruitsCache", cacheConfig);
+    fruitsCache.put(1L, "apple");
+    fruitsCache.put(2L, "orange");
+    fruitsCache.put(3L, "mango");
+    assertThat(fruitsCache.get(1L), is("apple"));
+    assertThat(fruitsCache.get(3L), is("mango"));
+    assertThat(fruitsCache.get(2L), is("orange"));
+    assertThat(fruitsCache.get(1L), is("apple"));
+    // end::thirdPartySerializer[]
+  }
 
 }

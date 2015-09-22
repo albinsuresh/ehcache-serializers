@@ -1,5 +1,5 @@
 ifndef::sourcedir[]
-include::common.adoc[]
+:sourcedir: ../..
 endif::sourcedir[]
 
 = Custom Serializers
@@ -38,7 +38,7 @@ space(dumb, huh???). And here is the serializer implementation that I came up wi
 
 [source,java,indent=0]
 ----
-include::{sourcedir}/impl/src/test/java/org/ehcache/docs/serializers/DumbTransientStringSerializer.java[tag=transientSerializer]
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/DumbTransientStringSerializer.java[tag=transientSerializer]
 ----
 
 In short this is what the above serializer does: Whenever it gets a string(the fruit name, in our application) to be
@@ -56,7 +56,7 @@ Here is a sample code that uses the `DumbTransientStringSerializer` with a cache
 
 [source,java,indent=0]
 ----
-include::{sourcedir}/impl/src/test/java/org/ehcache/docs/serializers/SerializersDemo.java[tag=transientSerializerGoodSample]
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/SerializersDemo.java[tag=transientSerializerGoodSample]
 ----
 
 <1> Create a multi-tiered cache that depends on key and value serialization.
@@ -73,7 +73,7 @@ But there is a serious problem. The following piece of code would demonstrate th
 
 [source,java,indent=0]
 ----
-include::{sourcedir}/impl/src/test/java/org/ehcache/docs/serializers/SerializersDemo.java[tag=transientSerializerBadSample]
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/SerializersDemo.java[tag=transientSerializerBadSample]
 ----
 
 <1> Create a cache configuration with persistent disk tier.
@@ -107,7 +107,7 @@ serializer with the persistent stuff wired in.
 
 [source,java,indent=0]
 ----
-include::{sourcedir}/impl/src/test/java/org/ehcache/docs/serializers/DumbPersistentStringSerializer.java[tag=persistentSerializer]
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/DumbPersistentStringSerializer.java[tag=persistentSerializer]
 ----
 
 In the above persistent serializer the state or the serialization/deserialization has not changed. The only additional
@@ -117,7 +117,34 @@ serializer.
 
 [source,java,indent=0]
 ----
-include::{sourcedir}/impl/src/test/java/org/ehcache/docs/serializers/SerializersDemo.java[tag=persistentSerializerGoodSample]
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/SerializersDemo.java[tag=persistentSerializerGoodSample]
 ----
 
 <1> The only change from the previous sample is the usage of `DumbPersistentStringSerializer` here.
+
+== Third-party serializers
+
+Ehcache by-default relies on a tweaked form of java standard serialization to perform serialization and deserialization.
+But most of you already know that java built-in serialization is not the best performing serialization technique. A lot
+of alternative serialization techniques are available in the market. With the custom serializers support of ehcache
+you can take advantage of any one of those third-party serializers out there and use those within ehcache. All you have 
+to do is write a custom serializer using the third-party serializer of your choice.
+
+In-order to demonstrate that, I have written a custom serializer using the popular serialization framework *kryo*. There
+is no specific reason for me to pick *kryo* in my example. I don't claim that kryo is the best serialization framework
+out there and I haven't really done a performance comparison either. The sole reason behind the choice was kryo's
+popularity and nothing else. So here is the kryo based custom serializer:
+
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/KryoStringSerializer.java[tag=thirdPartySerializer]
+----
+
+And here is the usage of the same:
+
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/SerializersDemo.java[tag=thirdPartySerializer]
+----
+
+<1> The only change from the previous sample is the usage of `KryoStringSerializer` here.
