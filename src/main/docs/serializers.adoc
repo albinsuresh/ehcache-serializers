@@ -34,7 +34,9 @@ serialized form in the authoritative-tier. For simplicity I'll restrict the scop
 that are fruit names of type `String`. I can use standard Java serialization to serialize these values. But for some
 reason I wanted to reduce the amount of serialized data. So instead of serializing the strings directly I decided to map
 all the fruit names to some integer and store those serialized integers instead of strings thinking that it'd save some
-space(dumb, huh???). And here is the serializer implementation that I came up with:
+space(dumb, huh?). Since this serializer is designed specifically for the fruits cache, I was fairly confident that the
+integer range would be more than enough to handle all possible fruit names on this planet. And here is the serializer
+implementation that I came up with:
 
 [source,java,indent=0]
 ----
@@ -130,21 +132,99 @@ of alternative serialization techniques are available in the market. With the cu
 you can take advantage of any one of those third-party serializers out there and use those within ehcache. All you have 
 to do is write a custom serializer using the third-party serializer of your choice.
 
-In-order to demonstrate that, I have written a custom serializer using the popular serialization framework *kryo*. There
+In-order to demonstrate that, I have written a custom serializer using the popular serialization framework *Kryo*. There
 is no specific reason for me to pick *kryo* in my example. I don't claim that kryo is the best serialization framework
 out there and I haven't really done a performance comparison either. The sole reason behind the choice was kryo's
-popularity and nothing else. So here is the kryo based custom serializer:
+popularity and nothing else.
+
+Samples used in this section are not the same fruits cache based ones. Here I'm using an employee cache of type
+`Cache<Long, Employee>`. I have kept the `Employee` object as simple as possible and yet represent a real-life object
+structure. These are the structures that we have used:
 
 [source,java,indent=0]
 ----
-include::{sourcedir}/test/java/org/ehcache/demo/serializer/KryoStringSerializer.java[tag=thirdPartySerializer]
+include::{sourcedir}/test/java/org/ehcache/demo/model/Description.java[tag=descriptionClass]
 ----
 
-And here is the usage of the same:
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/model/Person.java[tag=personClass]
+----
+
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/model/Employee.java[tag=employeeClass]
+----
+
+NOTE: None of the above classes are `Serializable`. Yet they can be serialized with Kryo. But for that every class needs
+a no-arg constructor and these classes meet that requirement.
+
+So here is the kryo based custom serializer:
+
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/KryoSerializer.java[tag=thirdPartySerializer]
+----
+
+The above serializer is a state-less one that demonstrates the basic integration with kryo. Here is the sample code that
+uses the same:
 
 [source,java,indent=0]
 ----
 include::{sourcedir}/test/java/org/ehcache/demo/serializer/SerializersDemo.java[tag=thirdPartySerializer]
 ----
 
-<1> The only change from the previous sample is the usage of `KryoStringSerializer` here.
+<1> Here we configure the `KryoSerializer` for the *VALUE*.
+
+Using some advanced features of kryo I managed to write the `Transient` only and `Persistent` only versions too.
+
+Here is the transient one:
+
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/TransientKryoSerializer.java[tag=thirdPartyTransientSerializer]
+----
+
+<1> This *objectHeaderMap* is the state of the serializer. When an object is serialized the fully qualified name of the
+    class is written in the header. Since writing the entire name is costly I decided to map these names to some integer
+    values and then write out that integer instead of the name. So this map would contain the mapping between the
+    classes and the corresponding integer values.
+<2> Here we register a class with kryo and then kryo will assign an integer value to that class so that all instances of
+    class will be serialized with this assigned integer in-place of the fully-qualified class name. The `Employee` class
+    in this case. Refer https://github.com/EsotericSoftware/kryo#registration[Kryo#Registartion] for more information.
+<3> Since `Employee` extends `Person` we register that too.
+<4> Since the `Person` class contain a `Description` instance we register that too. So the idea is to register all
+    known custom class types associated with the object to be serialized(the employee object).
+<5> This is how we populate the *objectHeaderMap* every time we register a class.
+
+The following sample is the same as the one in the previous section with just the serializer changed:
+
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/SerializersDemo.java[tag=transientKryoSerializer]
+----
+
+The above sample must be self explanatory as we have already seen this sample so many times.
+
+And now the persistent adaptation of the transient serializer is here:
+
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/PersistentKryoSerializer.java[tag=thirdPartyPersistentSerializer]
+----
+
+You must be familiar with this routine already:
+
+<1> On initialization, if a persistent file is found...
+<2> Restore the contents of the file which essentially restores the *objectHeaderMap*
+<3> Then iterate through the contents of the map and...
+<4> Register the types again with *kryo* using the same integer mapped values. Then only the persisted data can be 
+    deserialized as they are persisted with these integer values in their headers.  
+<5> On _close_, the map is serialized and persisted to a file.
+
+And the familiar test sample again testing this persistent serializer implementation: 
+
+[source,java,indent=0]
+----
+include::{sourcedir}/test/java/org/ehcache/demo/serializer/SerializersDemo.java[tag=persistentKryoSerializer]
+----
