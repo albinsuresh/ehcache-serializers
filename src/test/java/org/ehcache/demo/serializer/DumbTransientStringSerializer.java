@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 // tag::transientSerializer[]
-@Serializer.Transient
 public class DumbTransientStringSerializer implements Serializer<String> {
 
   protected Map<Integer, String> idStringMap = new HashMap<Integer, String>();

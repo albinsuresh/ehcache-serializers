@@ -22,7 +22,6 @@ import java.util.Map;
  * Created by alsu on 23/09/15.
  */
 // tag::thirdPartyTransientSerializer[]
-@Serializer.Transient
 public class TransientKryoSerializer implements Serializer<Employee> {
 
   protected static final Kryo kryo = new Kryo();

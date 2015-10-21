@@ -25,6 +25,8 @@ import static org.junit.Assert.assertThat;
  */
 public class SerializersDemo {
   
+  private static final String PERSISTENCE_PATH = "/Users/alsu/terracotta";
+  
   @Test
   public void testTransientSerializer() throws Exception {
     // tag::transientSerializerGoodSample[]
@@ -59,7 +61,7 @@ public class SerializersDemo {
         .buildConfig(Long.class, String.class);
 
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-        .with(new CacheManagerPersistenceConfiguration(new File("/Users/alsu/terracotta")))   // <2>
+        .with(new CacheManagerPersistenceConfiguration(new File(PERSISTENCE_PATH)))   // <2>
         .withCache("fruitsCache", cacheConfig)
         .build(true);
 
@@ -87,7 +89,7 @@ public class SerializersDemo {
         .buildConfig(Long.class, String.class);
 
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-        .with(new CacheManagerPersistenceConfiguration(new File("/Users/alsu/terracotta")))
+        .with(new CacheManagerPersistenceConfiguration(new File(PERSISTENCE_PATH)))
         .withCache("fruitsCache", cacheConfig)
         .build(true);
 
@@ -151,7 +153,7 @@ public class SerializersDemo {
         .buildConfig(Long.class, Employee.class);
 
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-        .with(new CacheManagerPersistenceConfiguration(new File("/Users/alsu/terracotta")))
+        .with(new CacheManagerPersistenceConfiguration(new File(PERSISTENCE_PATH)))
         .withCache("employeeCache", cacheConfig)
         .build(true);
 

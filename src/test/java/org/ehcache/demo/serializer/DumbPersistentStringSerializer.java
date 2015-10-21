@@ -14,7 +14,6 @@ import java.util.Map;
 
 
 // tag::persistentSerializer[]
-@Serializer.Persistent
 public class DumbPersistentStringSerializer extends DumbTransientStringSerializer {
 
   private final File stateFile;

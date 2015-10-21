@@ -20,7 +20,6 @@ import java.util.Map;
  * Created by alsu on 23/09/15.
  */
 // tag::thirdPartyPersistentSerializer[]
-@Serializer.Persistent
 public class PersistentKryoSerializer extends TransientKryoSerializer {
 
   private final File stateFile;
