@@ -13,6 +13,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ import java.util.Map;
  * Created by alsu on 23/09/15.
  */
 // tag::thirdPartyTransientSerializer[]
-public class TransientKryoSerializer implements Serializer<Employee> {
+public class TransientKryoSerializer implements Serializer<Employee>, Closeable{
 
   protected static final Kryo kryo = new Kryo();
 

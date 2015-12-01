@@ -3,6 +3,7 @@ package org.ehcache.demo.serializer;
 import org.ehcache.spi.serialization.Serializer;
 import org.ehcache.spi.service.FileBasedPersistenceContext;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 
 // tag::persistentSerializer[]
-public class DumbPersistentStringSerializer extends DumbTransientStringSerializer {
+public class DumbPersistentStringSerializer extends DumbTransientStringSerializer implements Closeable {
 
   private final File stateFile;
 

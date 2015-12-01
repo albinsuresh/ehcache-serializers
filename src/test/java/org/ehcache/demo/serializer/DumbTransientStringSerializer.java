@@ -48,10 +48,5 @@ public class DumbTransientStringSerializer implements Serializer<String> {
     return object.equals(read(binary));
   }
 
-  @Override
-  public void close() throws IOException {
-    // no-op
-  }
-
 }
 // end::transientSerializer[]

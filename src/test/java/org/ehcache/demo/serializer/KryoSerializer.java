@@ -45,10 +45,5 @@ public class KryoSerializer implements Serializer<Employee> {
     return object.equals(read(binary));
   }
 
-  @Override
-  public void close() throws IOException {
-    // no-op
-  }
-
 }
 // end::thirdPartySerializer[]
