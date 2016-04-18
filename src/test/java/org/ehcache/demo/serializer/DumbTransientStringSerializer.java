@@ -1,9 +1,8 @@
 package org.ehcache.demo.serializer;
 
-import org.ehcache.exceptions.SerializerException;
 import org.ehcache.spi.serialization.Serializer;
+import org.ehcache.spi.serialization.SerializerException;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;

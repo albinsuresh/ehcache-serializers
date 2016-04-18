@@ -1,8 +1,8 @@
 package org.ehcache.demo.serializer;
 
 import org.ehcache.demo.model.Employee;
-import org.ehcache.exceptions.SerializerException;
 import org.ehcache.spi.serialization.Serializer;
+import org.ehcache.spi.serialization.SerializerException;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.ByteBufferInputStream;

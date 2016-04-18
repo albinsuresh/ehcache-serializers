@@ -1,7 +1,6 @@
 package org.ehcache.demo.serializer;
 
-import org.ehcache.spi.serialization.Serializer;
-import org.ehcache.spi.service.FileBasedPersistenceContext;
+import org.ehcache.core.spi.service.FileBasedPersistenceContext;
 
 import java.io.Closeable;
 import java.io.File;

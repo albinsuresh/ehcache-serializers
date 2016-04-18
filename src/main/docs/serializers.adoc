@@ -4,11 +4,15 @@ endif::sourcedir[]
 
 = Custom Serializers
 
-The Getting Started document gives you an overview of how to use custom serializers with a cache.
-This document explains how you can write a custom serilaizer that works with Ehcache.
-Here we discuss the significance of serializer transient and persistent serializers in detail and what they actually 
+The Ehcache 3 documentation at http://www.ehcache.org/documentation/3.0/serializers-copiers.html#serializers[Serializers]
+gives you an overview of how to use custom serializers with a cache.
+The section on http://www.ehcache.org/documentation/3.0/serializers-copiers.html#persistent-vs-transient-caches[Persistent and Transient Serializers]
+briefly covers the serializer contracts that must be honored while writing custom serializers to be used with 
+persistent/transient caches.
+
+This document explains how you can write a transient/persistent custom serilaizer that works with Ehcache.
+Here we discuss the significance of transient serializers and persistent serializers in detail and what they actually 
 mean.
-Let's get started.
 
 == Serializer types
 
@@ -41,7 +45,7 @@ So what are these serializers with *state*? I'll try to explain that with some e
 I have an application that deals with fruits. So I have a _fruits_ cache `Cache<Long, String>` that holds the mappings
 from fruit ids to fruit names.
 If this cache is a multi-tiered one then the keys and values will be stored in their serialized form in the 
-authoritative-tier.
+non-heap tiers.
 For simplicity I'll restrict the scope of our discussion only to the values that are fruit names of type `String`.
 I can use standard Java serialization to serialize these values.
 But for some reason I wanted to reduce the amount of serialized data.
@@ -105,13 +109,17 @@ include::{sourcedir}/test/java/org/ehcache/demo/serializer/SerializersDemo.java[
 <8> Retrieve the cache.
 <9> Retrieve a cached/persisted value.
 
-The above piece of code would fail in step 9 because the cache will not be able to retrieve the persisted data. But why?
-Because the serializer that you provided fails in retrieving that data.
+The above piece of code would fail in the cache creation step since the serializer provided does not meet the 2-arg 
+constructor requirement for persistent caches.
+But why does `Ehcache` enforce this requirement and fail-fast if the requirement is violated?
+What would have happened if we had proceeded with the sample code? Would it have failed? If yes, then where?
+The above piece of code would have failed in step 9 because the cache would not be able to retrieve the persisted data.
+Because the serializer that you provided would fail in retrieving that data.
 When the cache is reinitialized, the associated serializer instance is also initialized for the cache to work.
 But the newly initialized serializer would have an empty state(empty *stringIdMap* and *idStringMap* maps and the *id*
 initialized to 0).
 So when the cache tries to read a value it gets an integer value from the persistent tier as that is what got persisted.
-But using the empty state the  serializer will not able to map that value to a fruit name, and so it throws.
+But using the empty state the serializer will not able to map that value to a fruit name, and so it would throw.
 That leaves the persisted data unusable.
 So what could you have done differently to make it work? The answer is simple. Persist the serializer's state as well
 and restore it when the cache is re-initialized.
@@ -126,7 +134,7 @@ of the persistence.
 Inorder to do that, the serializer implementation needs to have a constructor that takes in a
 `FileBasedPersistenceContext` as an argument, in addition to class loader argument.
 The use of the `FileBasedPersistenceContext` argument is optional.
-But the presence of this doubl-argument constructor is a strict requirement for persistent caches.
+But the presence of this double-argument constructor is a strict requirement for persistent caches.
 When the cache using this serializer is initialized, this 2-argument constructor is used to instantiate the serializer.
 Have a look at this dummy implementation of a persistent serializer.
 It is just an extension of the same old transient serializer with the persistent stuff wired in.

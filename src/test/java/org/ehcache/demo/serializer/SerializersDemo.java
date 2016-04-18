@@ -2,17 +2,15 @@ package org.ehcache.demo.serializer;
 
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
-import org.ehcache.CacheManagerBuilder;
 import org.ehcache.config.CacheConfiguration;
-import org.ehcache.config.CacheConfigurationBuilder;
-import org.ehcache.config.ResourcePoolsBuilder;
-import org.ehcache.config.SerializerConfiguration;
-import org.ehcache.config.persistence.CacheManagerPersistenceConfiguration;
-import org.ehcache.config.serializer.DefaultSerializerConfiguration;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.config.units.EntryUnit;
 import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.demo.model.Description;
 import org.ehcache.demo.model.Employee;
+import org.ehcache.impl.config.persistence.CacheManagerPersistenceConfiguration;
 import org.junit.Ignore;
 import org.junit.Test;
 import java.io.File;
@@ -31,12 +29,11 @@ public class SerializersDemo {
   public void testTransientSerializer() throws Exception {
     // tag::transientSerializerGoodSample[]
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);
-    CacheConfiguration<Long, String> cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder()
-        .withResourcePools(ResourcePoolsBuilder.newResourcePoolsBuilder()
-            .heap(10, EntryUnit.ENTRIES).offheap(1, MemoryUnit.MB))   // <1>
-        .add(new DefaultSerializerConfiguration<String>(
-            DumbTransientStringSerializer.class, SerializerConfiguration.Type.VALUE))   // <2>
-        .buildConfig(Long.class, String.class);
+    CacheConfiguration<Long, String> cacheConfig = 
+        CacheConfigurationBuilder.newCacheConfigurationBuilder(
+            Long.class, String.class, ResourcePoolsBuilder.heap(10).offheap(5, MemoryUnit.MB))  // <1>
+        .withValueSerializer(DumbTransientStringSerializer.class)   // <2>
+        .build();
 
     Cache<Long, String> fruitsCache = cacheManager.createCache("fruitsCache", cacheConfig);
     fruitsCache.put(1L, "apple");
@@ -53,12 +50,12 @@ public class SerializersDemo {
   @Test
   public void testTransientSerializerWithPersistentCache() throws Exception {
     // tag::transientSerializerBadSample[]
-    CacheConfiguration<Long, String> cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder()
-        .withResourcePools(ResourcePoolsBuilder.newResourcePoolsBuilder()
-            .heap(10, EntryUnit.ENTRIES).offheap(1, MemoryUnit.MB).disk(2, MemoryUnit.MB, true))  // <1>
-        .add(new DefaultSerializerConfiguration<String>(
-            DumbTransientStringSerializer.class, SerializerConfiguration.Type.VALUE))
-        .buildConfig(Long.class, String.class);
+    CacheConfiguration<Long, String> cacheConfig =
+        CacheConfigurationBuilder.newCacheConfigurationBuilder(
+            Long.class, String.class,
+            ResourcePoolsBuilder.heap(10).disk(10, MemoryUnit.MB, true))  // <1>
+            .withValueSerializer(DumbTransientStringSerializer.class)
+            .build();
 
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
         .with(new CacheManagerPersistenceConfiguration(new File(PERSISTENCE_PATH)))   // <2>
@@ -81,12 +78,13 @@ public class SerializersDemo {
   @Test
   public void testPersistentSerializer() throws Exception {
     // tag::persistentSerializerGoodSample[]
-    CacheConfiguration<Long, String> cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder()
-        .withResourcePools(ResourcePoolsBuilder.newResourcePoolsBuilder()
-            .heap(10, EntryUnit.ENTRIES).offheap(1, MemoryUnit.MB).disk(2, MemoryUnit.MB, true))
-        .add(new DefaultSerializerConfiguration<String>(
-            DumbPersistentStringSerializer.class, SerializerConfiguration.Type.VALUE))    // <1>
-        .buildConfig(Long.class, String.class);
+    CacheConfiguration<Long, String> cacheConfig =
+        CacheConfigurationBuilder.newCacheConfigurationBuilder(
+            Long.class, String.class,
+            ResourcePoolsBuilder.newResourcePoolsBuilder()
+                .heap(10, EntryUnit.ENTRIES).disk(10, MemoryUnit.MB, true))
+            .withValueSerializer(DumbPersistentStringSerializer.class)   // <1>
+            .build();
 
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
         .with(new CacheManagerPersistenceConfiguration(new File(PERSISTENCE_PATH)))
@@ -110,12 +108,10 @@ public class SerializersDemo {
   public void testKryoSerializer() throws Exception {
     // tag::thirdPartySerializer[]
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);
-    CacheConfiguration<Long, Employee> cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder()
-        .withResourcePools(ResourcePoolsBuilder.newResourcePoolsBuilder()
-            .heap(10, EntryUnit.ENTRIES).offheap(1, MemoryUnit.MB))
-        .add(new DefaultSerializerConfiguration<Employee>(
-            KryoSerializer.class, SerializerConfiguration.Type.VALUE))
-        .buildConfig(Long.class, Employee.class);
+    CacheConfiguration<Long, Employee> cacheConfig =
+        CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, Employee.class, ResourcePoolsBuilder.heap(10))
+            .withValueSerializer(KryoSerializer.class)
+            .build();
 
     Cache<Long, Employee> employeeCache = cacheManager.createCache("employeeCache", cacheConfig);
     Employee emp =  new Employee(1234, "foo", 23, new Description("bar", 879));
@@ -128,12 +124,10 @@ public class SerializersDemo {
   public void testTransientKryoSerializer() throws Exception {
     // tag::transientKryoSerializer[]
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);
-    CacheConfiguration<Long, Employee> cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder()
-        .withResourcePools(ResourcePoolsBuilder.newResourcePoolsBuilder()
-            .heap(10, EntryUnit.ENTRIES).offheap(1, MemoryUnit.MB))
-        .add(new DefaultSerializerConfiguration<Employee>(
-            TransientKryoSerializer.class, SerializerConfiguration.Type.VALUE))
-        .buildConfig(Long.class, Employee.class);
+    CacheConfiguration<Long, Employee> cacheConfig =
+        CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, Employee.class, ResourcePoolsBuilder.heap(10))
+            .withValueSerializer(TransientKryoSerializer.class)
+            .build();
 
     Cache<Long, Employee> employeeCache = cacheManager.createCache("employeeCache", cacheConfig);
     Employee emp =  new Employee(1234, "foo", 23, new Description("bar", 879));
@@ -145,12 +139,13 @@ public class SerializersDemo {
   @Test
   public void testPersistentKryoSerializer() throws Exception {
     // tag::persistentKryoSerializer[]
-    CacheConfiguration<Long, Employee> cacheConfig = CacheConfigurationBuilder.newCacheConfigurationBuilder()
-        .withResourcePools(ResourcePoolsBuilder.newResourcePoolsBuilder()
-            .heap(10, EntryUnit.ENTRIES).offheap(1, MemoryUnit.MB).disk(2, MemoryUnit.MB, true))
-        .add(new DefaultSerializerConfiguration<Employee>(
-            PersistentKryoSerializer.class, SerializerConfiguration.Type.VALUE))
-        .buildConfig(Long.class, Employee.class);
+    CacheConfiguration<Long, Employee> cacheConfig =
+        CacheConfigurationBuilder.newCacheConfigurationBuilder(
+            Long.class, Employee.class,
+            ResourcePoolsBuilder.newResourcePoolsBuilder()
+                .heap(10, EntryUnit.ENTRIES).offheap(5, MemoryUnit.MB).disk(10, MemoryUnit.MB, true))
+            .withValueSerializer(PersistentKryoSerializer.class)
+            .build();
 
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
         .with(new CacheManagerPersistenceConfiguration(new File(PERSISTENCE_PATH)))

@@ -1,10 +1,7 @@
 package org.ehcache.demo.serializer;
 
-import org.ehcache.demo.model.Employee;
-import org.ehcache.spi.serialization.Serializer;
-import org.ehcache.spi.service.FileBasedPersistenceContext;
+import org.ehcache.core.spi.service.FileBasedPersistenceContext;
 
-import com.esotericsoftware.kryo.Registration;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 

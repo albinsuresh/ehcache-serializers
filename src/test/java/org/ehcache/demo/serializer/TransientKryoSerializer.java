@@ -3,8 +3,8 @@ package org.ehcache.demo.serializer;
 import org.ehcache.demo.model.Description;
 import org.ehcache.demo.model.Employee;
 import org.ehcache.demo.model.Person;
-import org.ehcache.exceptions.SerializerException;
 import org.ehcache.spi.serialization.Serializer;
+import org.ehcache.spi.serialization.SerializerException;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Registration;
