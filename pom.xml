@@ -53,6 +53,7 @@
       <artifactId>kryo</artifactId>
       <version>3.0.3</version>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -65,6 +66,25 @@
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.asciidoctor</groupId>
+        <artifactId>asciidoctor-maven-plugin</artifactId>
+        <version>1.5.2</version>
+        <executions>
+          <execution>
+            <id>output-html</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>process-asciidoc</goal>
+            </goals>
+            <configuration>
+              <backend>html</backend>
+            </configuration>
+          </execution>
+        </executions>
+        
       </plugin>
     </plugins>
   </build>

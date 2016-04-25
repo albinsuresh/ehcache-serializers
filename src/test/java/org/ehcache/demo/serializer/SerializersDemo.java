@@ -110,7 +110,7 @@ public class SerializersDemo {
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder().build(true);
     CacheConfiguration<Long, Employee> cacheConfig =
         CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, Employee.class, ResourcePoolsBuilder.heap(10))
-            .withValueSerializer(KryoSerializer.class)
+            .withValueSerializer(KryoSerializer.class)  // <1>
             .build();
 
     Cache<Long, Employee> employeeCache = cacheManager.createCache("employeeCache", cacheConfig);
