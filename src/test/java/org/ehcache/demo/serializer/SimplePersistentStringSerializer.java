@@ -14,11 +14,11 @@ import java.util.Map;
 
 
 // tag::persistentSerializer[]
-public class DumbPersistentStringSerializer extends DumbTransientStringSerializer implements Closeable {
+public class SimplePersistentStringSerializer extends SimpleTransientStringSerializer implements Closeable {
 
   private final File stateFile;
 
-  public DumbPersistentStringSerializer(final ClassLoader loader, FileBasedPersistenceContext persistence) throws IOException, ClassNotFoundException {
+  public SimplePersistentStringSerializer(final ClassLoader loader, FileBasedPersistenceContext persistence) throws IOException, ClassNotFoundException {
     super(loader);
     stateFile = new File(persistence.getDirectory(), "serializer.data");
     if(stateFile.exists()) {

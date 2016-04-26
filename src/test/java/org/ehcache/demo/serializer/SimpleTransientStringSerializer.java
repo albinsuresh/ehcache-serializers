@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 // tag::transientSerializer[]
-public class DumbTransientStringSerializer implements Serializer<String> {
+public class SimpleTransientStringSerializer implements Serializer<String> {
 
   protected Map<Integer, String> idStringMap = new HashMap<Integer, String>();
   protected Map<String, Integer> stringIdMap = new HashMap<String, Integer>();
   protected int id = 0;
 
-  public DumbTransientStringSerializer(ClassLoader loader) {
+  public SimpleTransientStringSerializer(ClassLoader loader) {
     //no-op
   }
 

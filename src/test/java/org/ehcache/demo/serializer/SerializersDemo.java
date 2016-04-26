@@ -32,7 +32,7 @@ public class SerializersDemo {
     CacheConfiguration<Long, String> cacheConfig = 
         CacheConfigurationBuilder.newCacheConfigurationBuilder(
             Long.class, String.class, ResourcePoolsBuilder.heap(10).offheap(5, MemoryUnit.MB))  // <1>
-        .withValueSerializer(DumbTransientStringSerializer.class)   // <2>
+        .withValueSerializer(SimpleTransientStringSerializer.class)   // <2>
         .build();
 
     Cache<Long, String> fruitsCache = cacheManager.createCache("fruitsCache", cacheConfig);
@@ -54,7 +54,7 @@ public class SerializersDemo {
         CacheConfigurationBuilder.newCacheConfigurationBuilder(
             Long.class, String.class,
             ResourcePoolsBuilder.heap(10).disk(10, MemoryUnit.MB, true))  // <1>
-            .withValueSerializer(DumbTransientStringSerializer.class)
+            .withValueSerializer(SimpleTransientStringSerializer.class)
             .build();
 
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
@@ -83,7 +83,7 @@ public class SerializersDemo {
             Long.class, String.class,
             ResourcePoolsBuilder.newResourcePoolsBuilder()
                 .heap(10, EntryUnit.ENTRIES).disk(10, MemoryUnit.MB, true))
-            .withValueSerializer(DumbPersistentStringSerializer.class)   // <1>
+            .withValueSerializer(SimplePersistentStringSerializer.class)   // <1>
             .build();
 
     CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
