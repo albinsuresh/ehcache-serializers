@@ -11,14 +11,16 @@ briefly covers the serializer contracts that must be honored while writing custo
 persistent/transient caches.
 
 This document explains how you can write a transient/persistent custom serializer that works with Ehcache.
-Here we discuss the significance of transient serializers and persistent serializers in detail through a practical example
+Here we discuss the significance of transient serializers and persistent serializers in detail through some
+practical examples.
 
 == Serializer types
 
 As indicated in the Ehcache documentation, serializers require a single argument constructor or a double-argument 
-constructor or both based on the type of the cache they are used in.
+constructor or both based on the type of cache they are used in.
 The single-argument constructor is fit to be used with transient caches and the ones with the double-argument constructor can be used with persistent caches.
 An implementation having both the constructors can be used with both _persistent_ and _transient_ caches.
+
 Hmm... So what does that really mean?
 
 If you look at the custom serializer implementations in the GettingStarted samples they are all have both the constructors
