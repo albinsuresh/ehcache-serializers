@@ -10,7 +10,7 @@ The section on http://www.ehcache.org/documentation/3.0/serializers-copiers.html
 briefly covers the serializer contracts that must be honored while writing custom serializers to be used with 
 persistent/transient caches.
 
-This document explains how you can write a transient/persistent custom serializer that works with Ehcache.
+This article explains how you can write a transient/persistent custom serializer that works with Ehcache.
 Here we discuss the significance of transient serializers and persistent serializers in detail through some
 practical examples.
 
